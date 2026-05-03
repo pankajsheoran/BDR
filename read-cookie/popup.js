@@ -1,4 +1,3 @@
-// popup.js
 import { CONFIG } from "./config.js";
 
 const logEl = document.getElementById("log");
@@ -18,8 +17,11 @@ function fetchAndDisplayCookies() {
   });
 }
 
-// Refresh button
+// Manual refresh button
 refreshBtn.addEventListener("click", fetchAndDisplayCookies);
 
-// Auto fetch on popup open
+// Auto-refresh every 5 seconds
+setInterval(fetchAndDisplayCookies, 5000);
+
+// Initial fetch when popup opens
 fetchAndDisplayCookies();
