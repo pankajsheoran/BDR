@@ -1,4 +1,4 @@
 // config.js
 export const CONFIG = {
-  backendURL: "https://your-backend.com/upload" // backend to send cookies
+  BACKEND_URL: "http://10.1.33.122" // Change this once
 };

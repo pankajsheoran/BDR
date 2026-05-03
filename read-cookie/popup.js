@@ -1,23 +1,25 @@
+// popup.js
+import { CONFIG } from "./config.js";
+
 const logEl = document.getElementById("log");
 const refreshBtn = document.getElementById("refreshBtn");
 
-// Function to fetch all cookies from background and display
+// Fetch cookies from background and display
 function fetchAndDisplayCookies() {
-  chrome.runtime.sendMessage({ action: "getCookies" }, (response) => {
-    const allCookies = response.allCookies;
-
-    if (!allCookies || allCookies.length === 0) {
-      logEl.textContent = "No accessible cookies found.";
-      return;
-    }
-
-    // Display all cookies
-    logEl.textContent = JSON.stringify(allCookies, null, 2);
+  chrome.runtime.sendMessage({ action: "readNow" }, (response) => {
+    chrome.cookies.getAll({}, (cookies) => {
+      const allCookies = (cookies || []).map(cookie => ({
+        domain: cookie.domain,
+        name: cookie.name,
+        value: cookie.value
+      }));
+      logEl.textContent = JSON.stringify(allCookies, null, 2);
+    });
   });
 }
 
 // Refresh button
 refreshBtn.addEventListener("click", fetchAndDisplayCookies);
 
-// Automatically load cookies when popup opens
+// Auto fetch on popup open
 fetchAndDisplayCookies();
