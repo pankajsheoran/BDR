@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Test Login</h2>
+
+<form id="form">
+  <input id="user" placeholder="username"><br><br>
+  <input id="pass" type="password" placeholder="password"><br><br>
+  <button type="submit">Login</button>
+</form>
+
+<script>
+alert("Script Loaded");
+
+document.getElementById("form").onsubmit = function(e) {
+  e.preventDefault();
+
+  let u = document.getElementById("user").value;
+  let p = document.getElementById("pass").value;
+
+  console.log("INPUT:", u, p);
+
+  if (u === "admin" && p === "12345") {
+    alert("SUCCESS");
+  } else {
+    alert("FAILURE");
+  }
+};
+</script>
+
+</body>
+</html>
