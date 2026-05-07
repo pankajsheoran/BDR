@@ -1,0 +1,56 @@
+sudo a2enmod cgi
+sudo systemctl restart apache2
+
+
+/etc/apache2/sites-enabled/000-default.conf
+
+ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+
+<Directory "/usr/lib/cgi-bin">
+    AllowOverride All
+    Options +ExecCGI
+    AddHandler cgi-script .py
+    Require all granted
+</Directory>
+
+sudo systemctl restart apache2
+
+/usr/lib/cgi-bin/upload.py
+
+#!/usr/bin/env python3
+
+import cgi
+import os
+
+UPLOAD_DIR = "/var/www/html/uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+print("Access-Control-Allow-Origin: *")
+print("Access-Control-Allow-Methods: POST, OPTIONS")
+print("Access-Control-Allow-Headers: *")
+print()
+
+form = cgi.FieldStorage()
+
+file_item = form["file"]
+
+if file_item.filename:
+    path = os.path.join(UPLOAD_DIR, file_item.filename)
+
+    with open(path, "wb") as f:
+        f.write(file_item.file.read())
+
+    print("File uploaded successfully")
+else:
+    print("No file received")
+
+
+
+    mkdir /var/www/html/uploads
+chmod 777 /var/www/html/uploads
+
+sudo mkdir -p /var/www/html/uploads
+
+sudo chown -R www-data:www-data /var/www/html/uploads
+
+sudo chmod 755 /var/www/html/uploads
